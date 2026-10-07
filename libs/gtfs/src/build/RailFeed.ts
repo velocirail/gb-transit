@@ -62,13 +62,14 @@ export const TRANSFERS = fileSchema<TransferRow>("transfers.txt", [
 
 export const SHAPES = fileSchema<ShapeRow>("shapes.txt", GTFS_COLUMNS["shapes.txt"]);
 
-// Its own: no block_id, because a train has none, and a headcode, which only a
-// train has.
+// Its own: no block_id, because a train has none, and a headcode and traction,
+// which only a train has.
 //
 // shape_id goes last, and the nightly counts the trips with no line by looking
 // at the last field of each row. Moving it would leave that gate passing every
 // build - see `Compare with the last release` in feed.yml.
 export const TRIPS = fileSchema<TripRow>("trips.txt", [
   "route_id", "service_id", "trip_id", "trip_headsign", "trip_short_name", "direction_id",
-  "wheelchair_accessible", "bikes_allowed", "headcode", "shape_id"
+  "wheelchair_accessible", "bikes_allowed", "headcode", "power_type", "timing_load", "max_speed",
+  "shape_id"
 ]);

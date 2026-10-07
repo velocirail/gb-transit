@@ -4,7 +4,7 @@ import {STP} from "../model/OverlayRecord";
 import {Days, ScheduleCalendar} from "../model/ScheduleCalendar";
 import {schedule} from "../transform/MergeSchedules.spec";
 import {AgencyID, CRS, PickupDropOffType, RouteType, StopTime} from "@gb-transit/gtfs-schema";
-import {Schedule} from "./Schedule";
+import {Schedule, Traction} from "./Schedule";
 
 describe("Schedule", () => {
 
@@ -49,6 +49,22 @@ describe("Schedule", () => {
     const trip = withHeadcode("1A23").toTrip(1, "London Paddington");
 
     expect([trip.headcode, trip.trip_short_name]).to.deep.equal(["1A23", "GW123400"]);
+  });
+
+  it("keeps the traction through a clone", () => {
+    expect(withHeadcode("1A23", EMU).clone(ALL_DAYS_CALENDAR, 2).traction).to.deep.equal(EMU);
+  });
+
+  it("writes the traction into columns of its own", () => {
+    const {power_type, timing_load, max_speed} = withHeadcode("1A23", EMU).toTrip(1, "London Paddington");
+
+    expect([power_type, timing_load, max_speed]).to.deep.equal(["EMU", "387", 110]);
+  });
+
+  it("writes empty traction columns where the schedule has none", () => {
+    const {power_type, timing_load, max_speed} = withHeadcode("1A23").toTrip(1, "London Paddington");
+
+    expect([power_type, timing_load, max_speed]).to.deep.equal([null, null, null]);
   });
 
   it("writes no headcode where the schedule has none", () => {
@@ -173,7 +189,9 @@ const ALL_DAYS_CALENDAR = new ScheduleCalendar(
   {}
 );
 
-function withHeadcode(headcode: string | null): Schedule {
+const EMU: Traction = {powerType: "EMU", timingLoad: "387", speed: 110};
+
+function withHeadcode(headcode: string | null, traction: Traction | null = null): Schedule {
   return new Schedule(
     1,
     [stop("PNZ", "00:30")],
@@ -186,7 +204,8 @@ function withHeadcode(headcode: string | null): Schedule {
     true,
     true,
     [],
-    headcode
+    headcode,
+    traction
   );
 }
 

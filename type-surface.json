@@ -208,6 +208,7 @@
     "TIPLOC",
     "TUID",
     "TimetableSource",
+    "Traction",
     "Transfer",
     "TransferRow",
     "TransferType",

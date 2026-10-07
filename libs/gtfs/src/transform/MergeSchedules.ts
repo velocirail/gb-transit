@@ -57,6 +57,7 @@ function content(schedule: Schedule): string {
     schedule.firstClassAvailable,
     schedule.reservationPossible,
     schedule.headcode ?? "",
+    [schedule.traction?.powerType, schedule.traction?.timingLoad, schedule.traction?.speed].join(":"),
     schedule.stopTimes.map(s =>
       [s.stop_id, s.stop_sequence, s.arrival_time, s.departure_time, s.pickup_type, s.drop_off_type].join(":")
     ).join(",")

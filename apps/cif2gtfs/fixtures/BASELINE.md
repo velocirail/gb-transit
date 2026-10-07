@@ -13,6 +13,20 @@ before committing it** - that is the whole value of the file being text.
 
 ---
 
+## Trips carry their traction
+
+`golden/trips.txt` gains three columns after `headcode` - `power_type`, `timing_load` and
+`max_speed` - and moves in nothing else: with them cut out again the file is byte identical to the
+one before. `shape_id` is still last.
+
+They are columns 51-60 of the schedule's BS record. `C00049`'s reads `EMU387 110`, so `EMU`, `387`,
+`110`: a Class 387 at 110 mph. The speed is written as a number, so `080` is `80`.
+
+The split, across 128 trips: 35 `E,92,80`, 22 `D,350,125`, 22 `D,210,90`, 12 `EMU,387,110`,
+11 `D,385,125`, 7 `D,350,75`, 4 `EMU,378,75`, 4 `EMU,,`, 1 `EMU,,50`, and 10 with nothing at all.
+The empty and partly empty rows are all z-trains: every BS record in the fixture's ZTR leaves the
+timing load and speed blank, and 26 of its 46 leave the power type blank as well.
+
 ## Trips carry their headcode
 
 `golden/trips.txt` gains a `headcode` column, between `bikes_allowed` and `shape_id`, and moves in

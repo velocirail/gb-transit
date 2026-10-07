@@ -16,6 +16,18 @@ export function tripId(tuid: TUID, calendar: ScheduleCalendar): string {
 }
 
 /**
+ * What the BS record says hauls the train.
+ *
+ * `timingLoad` reads by `powerType`: the class of unit for a DMU or EMU (`387`),
+ * a trailing load in tonnes behind a locomotive. `speed` is the maximum in mph.
+ */
+export interface Traction {
+  powerType: string | null;
+  timingLoad: string | null;
+  speed: number | null;
+}
+
+/**
  * A CIF schedule (BS record)
  */
 export class Schedule implements OverlayRecord {
@@ -53,7 +65,13 @@ export class Schedule implements OverlayRecord {
      * Null where the record leaves it blank. A CR record can change it part
      * way along the journey; this is the one the train starts with.
      */
-    public readonly headcode: string | null = null
+    public readonly headcode: string | null = null,
+    /**
+     * What hauls the train. Null where the record leaves all of it blank, as
+     * most z-trains do. Like the headcode, a CR record can change it part way
+     * along; this is what the train starts with.
+     */
+    public readonly traction: Traction | null = null
   ) {}
 
   public get tripId(): string {
@@ -96,7 +114,8 @@ export class Schedule implements OverlayRecord {
       this.firstClassAvailable,
       this.reservationPossible,
       this.path,
-      this.headcode
+      this.headcode,
+      this.traction
     );
   }
 
@@ -109,7 +128,7 @@ export class Schedule implements OverlayRecord {
    *
    * `headcode` is not a GTFS field. The RSID already has `trip_short_name`, so
    * the train identity goes in a column of its own, which a consumer that does
-   * not know it ignores.
+   * not know it ignores. The traction columns are the same.
    *
    * `wheelchair_accessible` and `bikes_allowed` are both 0, which in GTFS means
    * "no information". Nothing in the DTD feed says otherwise, and claiming
@@ -131,6 +150,9 @@ export class Schedule implements OverlayRecord {
       wheelchair_accessible: 0,
       bikes_allowed: 0,
       headcode: this.headcode,
+      power_type: this.traction?.powerType ?? null,
+      timing_load: this.traction?.timingLoad ?? null,
+      max_speed: this.traction?.speed ?? null,
       shape_id: shapeId ?? null
     };
   }

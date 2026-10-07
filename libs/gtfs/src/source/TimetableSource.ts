@@ -69,6 +69,10 @@ export interface ScheduleStopTimeRow {
   retail_train_id: RSID,
   // The BS record's train identity, the headcode. Null where the record leaves it blank.
   train_identity: string | null,
+  // The BS record's traction: power type, timing load and speed, as the record writes them
+  power_type: string | null,
+  timing_load: string | null,
+  speed: string | null,
   runs_from: string,
   runs_to: string,
   monday: 0 | 1,

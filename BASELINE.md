@@ -12,6 +12,9 @@ entry here does not excuse a golden feed moving, and an entry there does not exc
 
 ## The type surface
 
+**Trips carry their traction.** `@gb-transit/gtfs` gains `Traction`, the power type, timing load
+and speed a `Schedule` now carries from its BS record. An addition only.
+
 **Reading the fare group permitted stations feed.**
 `@gb-transit/knowledgebase-fare-group-permitted-stations` is a new package, so every name the
 snapshot gains is an addition and nothing moves: the three ways in - `permittedStations`,

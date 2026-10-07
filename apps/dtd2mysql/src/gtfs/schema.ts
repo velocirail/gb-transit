@@ -200,6 +200,9 @@ export const trips = gtfsTable({
   wheelchair_accessible: nullable(integer(2)),
   bikes_allowed: nullable(integer(2)),
   headcode: nullable(char(4)),
+  power_type: nullable(char(3)),
+  timing_load: nullable(char(4)),
+  max_speed: nullable(integer(3)),
   // Nullable: a trip every station of which the feed cannot place has no line to point at. See Shapes.ts.
   shape_id: nullable(ascii(char(12))),
 }, {

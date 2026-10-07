@@ -154,9 +154,18 @@ or take it from wherever you already keep it.
 `calendar.txt` and `calendar_dates.txt`. Output is byte-identical to what `dtd2mysql --gtfs`
 produces from the same feed files, and the same input and `--today` always produce the same bytes.
 
-`trips.txt` carries one column GTFS does not define: `headcode`, the train identity from the
-schedule's BS record (such as `1A23`). `trip_short_name` holds the retail service ID, so the
-headcode has a column of its own. It is empty where the record leaves it blank.
+`trips.txt` carries columns GTFS does not define, all from the schedule's BS record and empty
+where the record leaves them blank:
+
+| column | from | example |
+|---|---|---|
+| `headcode` | train identity | `1A23` |
+| `power_type` | power type: `D`, `DEM`, `DMU`, `E`, `ED`, `EML`, `EMU` or `HST` | `EMU` |
+| `timing_load` | timing load: the class of a multiple unit, a load in tonnes behind a locomotive | `387` |
+| `max_speed` | speed, in mph | `110` |
+
+`trip_short_name` holds the retail service ID, so the headcode has a column of its own. Each value is
+what the train starts its journey with: a CR record that changes one part way along is not followed.
 
 A build that finds no schedules in the window fails rather than writing an empty feed.
 

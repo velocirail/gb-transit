@@ -24,6 +24,9 @@ const row = (overrides: object = {}): ScheduleStopTimeRow => (<ScheduleStopTimeR
   train_uid: "C00001",
   retail_train_id: "SR000100",
   train_identity: "2C14",
+  power_type: "EMU",
+  timing_load: "375 ",
+  speed: "100",
   runs_from: "2026-08-01",
   runs_to: "2026-12-01",
   monday: 1, tuesday: 1, wednesday: 1, thursday: 1, friday: 1, saturday: 0, sunday: 0,
@@ -63,6 +66,32 @@ describe("ScheduleBuilder", () => {
     await builder.loadSchedules(stream([row()]));
 
     expect(builder.results.schedules[0].headcode).to.equal("2C14");
+  });
+
+  it("takes the traction from the record, with the speed as a number", async () => {
+    const builder = new ScheduleBuilder();
+
+    await builder.loadSchedules(stream([row({power_type: "D  ", timing_load: "1350", speed: "075"})]));
+
+    expect(builder.results.schedules[0].traction)
+      .to.deep.equal({powerType: "D", timingLoad: "1350", speed: 75});
+  });
+
+  it("keeps what traction the record gives where it leaves some of it blank", async () => {
+    const builder = new ScheduleBuilder();
+
+    await builder.loadSchedules(stream([row({power_type: "EMU", timing_load: null, speed: "   "})]));
+
+    expect(builder.results.schedules[0].traction)
+      .to.deep.equal({powerType: "EMU", timingLoad: null, speed: null});
+  });
+
+  it("has no traction where the record leaves all of it blank", async () => {
+    const builder = new ScheduleBuilder();
+
+    await builder.loadSchedules(stream([row({power_type: "   ", timing_load: null, speed: null})]));
+
+    expect(builder.results.schedules[0].traction).to.equal(null);
   });
 
   // Postgres hands a char(4) back padded to its width, so a blank one is four spaces rather than null

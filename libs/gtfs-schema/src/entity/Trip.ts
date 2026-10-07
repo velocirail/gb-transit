@@ -32,6 +32,18 @@ export interface Trip {
    */
   headcode?: string | null;
   /**
+   * What hauls the train, from the BS record: the power type (D, E, ED, DMU,
+   * EMU, HST...), the timing load and the maximum speed in mph.
+   *
+   * The timing load means what the power type says it means: the class of a
+   * multiple unit (`387` on an EMU), a trailing load in tonnes behind a
+   * locomotive. All three are producer extensions, like the headcode, and
+   * null where the record leaves them blank.
+   */
+  power_type?: string | null;
+  timing_load?: string | null;
+  max_speed?: number | null;
+  /**
    * The line this trip runs over, into shapes.txt.
    *
    * Optional because a feed need not draw one, and null on a trip whose stations

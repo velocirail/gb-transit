@@ -33,6 +33,7 @@ export type {RSID, TUID} from "@gb-transit/gtfs-schema";
 export {compare, dayOfWeek, maxDate, minDate, toYYYYMMDD} from "@gb-transit/gtfs-schema";
 export type {DayOfWeek} from "@gb-transit/gtfs-schema";
 export {Schedule, tripId} from "./model/Schedule";
+export type {Traction} from "./model/Schedule";
 export {NO_DAYS, OverlapType, ScheduleCalendar} from "./model/ScheduleCalendar";
 export type {BankHoliday, Days, ExcludeDays} from "./model/ScheduleCalendar";
 

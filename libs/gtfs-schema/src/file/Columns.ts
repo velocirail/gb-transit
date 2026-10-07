@@ -127,11 +127,12 @@ export const GTFS_COLUMNS = {
     "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"
   ] satisfies Columns<TransferRow>,
 
-  // headcode is a producer extension: the rail feed's signalling ID, which GTFS
-  // has no field for.
+  // headcode, power_type, timing_load and max_speed are producer extensions: the
+  // rail feed's signalling ID and traction, which GTFS has no field for.
   "trips.txt": [
     "route_id", "service_id", "trip_id", "trip_headsign", "trip_short_name", "direction_id",
-    "wheelchair_accessible", "bikes_allowed", "block_id", "headcode", "shape_id"
+    "wheelchair_accessible", "bikes_allowed", "block_id", "headcode", "power_type", "timing_load",
+    "max_speed", "shape_id"
   ] satisfies Columns<TripRow>
 } as const;
 

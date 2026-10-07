@@ -37,9 +37,9 @@ const tiploc = (code: string, crs: string) =>
  * A BS record. `course_indicator` is not nullable, so it has to hold something.
  */
 const schedule = (uid: string, from: string, to: string, days: string, stp: string, action = "N", category = "OO",
-                  identity = "") =>
+                  identity = "", traction = "") =>
   at([0, "BS"], [2, action], [3, uid], [9, from], [15, to], [21, days], [28, " "],
-     [29, "P"], [30, category], [32, identity], [40, "1"], [66, "B"], [79, stp]);
+     [29, "P"], [30, category], [32, identity], [40, "1"], [50, traction], [66, "B"], [79, stp]);
 
 const extra = (atoc: string, rsid: string) =>
   at([0, "BX"], [11, atoc], [13, "P"], [14, rsid]);
@@ -93,7 +93,7 @@ const refresh = () => zip("RJTTF001", {
   MCA: [
     tiploc("TONBDG", "TON"),
     tiploc("SEVNOKS", "SEV"),
-    schedule("C00001", "240101", "240401", "1111100", "P", "N", "OO", "2A15"),
+    schedule("C00001", "240101", "240401", "1111100", "P", "N", "OO", "2A15", "EMU375 100"),
     extra("SE", "SE000100"),
     origin("TONBDG ", "0800 "),
     terminus("SEVNOKS", "0820 ")
@@ -192,6 +192,7 @@ describe("CifFileSource", () => {
     expect(train.operator).to.equal("SE");
     expect(train.rsid).to.equal("SE000100");
     expect(train.headcode).to.equal("2A15");
+    expect(train.traction).to.deep.equal({powerType: "EMU", timingLoad: "375", speed: 100});
     // The station, not the platform. The platform rides alongside and only
     // becomes part of the stop id when stop_times.txt is written.
     expect(train.stopTimes.map(s => [s.stop_id, s.platform, s.arrival_time, s.stop_sequence]))
@@ -263,7 +264,7 @@ describe("CifFileSource", () => {
     expect(bus.headcode).to.equal("0B00");
   });
 
-  it("leaves the headcode null where the BS record leaves the train identity blank", async () => {
+  it("leaves the headcode and traction null where the BS record leaves them blank", async () => {
     const blank = zip("RJTTF001", {
       MSN,
       MCA: [
@@ -278,6 +279,7 @@ describe("CifFileSource", () => {
     const {schedules} = await source(blank).getSchedules();
 
     expect(schedules.find(s => s.tuid === "C00002")!.headcode).to.equal(null);
+    expect(schedules.find(s => s.tuid === "C00002")!.traction).to.equal(null);
   });
 
   /**

@@ -1,6 +1,6 @@
 import {Temporal} from "temporal-polyfill";
 import {IdGenerator, STP} from "../model/OverlayRecord";
-import {Schedule, tripId} from "../model/Schedule";
+import {Schedule, Traction, tripId} from "../model/Schedule";
 import {CRS, Duration, PickupDropOffType, RouteType, StopTime, parseDuration} from "@gb-transit/gtfs-schema";
 import {NO_DAYS, ScheduleCalendar} from "../model/ScheduleCalendar";
 import {ScheduleStopTimeRow} from "../source/TimetableSource";
@@ -299,7 +299,8 @@ export class ScheduleBuilder {
       row.reservations !== null,
       path,
       // trimmed because Postgres pads a char column back out to its width
-      row.train_identity?.trim() || null
+      row.train_identity?.trim() || null,
+      traction(row)
     );
   }
 
@@ -564,6 +565,20 @@ function clockTime(time: Duration): string {
   const pad = (n: number) => String(n).padStart(2, "0");
 
   return `${pad(Math.floor(time / 3600))}:${pad(Math.floor(time / 60) % 60)}:${pad(time % 60)}`;
+}
+
+/**
+ * The traction the BS record gives, or null where it gives none. Trimmed for the same reason as the
+ * headcode: Postgres pads a char column back out to its width.
+ */
+function traction(row: ScheduleStopTimeRow): Traction | null {
+  const powerType = row.power_type?.trim() || null;
+  const timingLoad = row.timing_load?.trim() || null;
+  const speed = parseInt(row.speed ?? "", 10);
+
+  return powerType === null && timingLoad === null && isNaN(speed)
+    ? null
+    : {powerType, timingLoad, speed: isNaN(speed) ? null : speed};
 }
 
 function hasActivity(activity: string, code: string): boolean {
