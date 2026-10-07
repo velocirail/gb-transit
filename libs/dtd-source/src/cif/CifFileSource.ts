@@ -459,6 +459,7 @@ class ScheduleLoader {
       id: pending.id,
       train_uid: values.train_uid as string,
       retail_train_id: (extra?.retail_train_id ?? null) as string,
+      train_identity: (values.train_identity ?? null) as string | null,
       runs_from: values.runs_from as string,
       runs_to: values.runs_to as string,
       monday: values.monday, tuesday: values.tuesday, wednesday: values.wednesday,
@@ -510,6 +511,7 @@ class ScheduleLoader {
       // the query selects a bare `null` for this column, so it arrives undefined
       retail_train_id: undefined as unknown as string,
       train_uid: values.train_uid as string,
+      train_identity: (values.train_identity ?? null) as string | null,
       runs_from: values.runs_from as string,
       runs_to: values.runs_to as string,
       monday: values.monday, tuesday: values.tuesday, wednesday: values.wednesday,

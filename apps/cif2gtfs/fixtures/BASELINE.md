@@ -13,6 +13,25 @@ before committing it** - that is the whole value of the file being text.
 
 ---
 
+## Trips carry their headcode
+
+`golden/trips.txt` gains a `headcode` column, between `bikes_allowed` and `shape_id`, and moves in
+nothing else: with the column taken out again every one of the 128 rows is byte identical.
+
+The value is the train identity from the schedule's BS record, columns 33-36. `C00049`, the first
+row, is `BSNC000492605172612060000001 PXX1Y94...` in the MCA, so `1Y94`.
+
+116 trips have one and 12 do not. The 12 are every trip built from a z-train - `Z01401`, `Z01501`,
+`Z08021`, `Z08101` and the rest - and every BS record in the fixture's ZTR leaves the train identity
+blank, so the column is empty rather than invented.
+
+`shape_id` stays the last column on purpose. The nightly counts the trips with no line by reading the
+last field of each row, so the new column goes in front of it rather than after.
+
+`validator-baseline.json` changes only in the reason it gives for `unknown_column`, which now names
+the headcode as well. The notice was already accepted for the transfers.txt extensions, so nothing
+new is let through.
+
 ## A boarding point no longer answers for its station's accessibility
 
 `golden/stops.txt` moves in one column, `wheelchair_boarding`, on 129 of its 345 rows. Every one is

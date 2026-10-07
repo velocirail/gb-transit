@@ -23,6 +23,15 @@ export interface Trip {
    */
   block_id?: string | null;
   /**
+   * The train's headcode - the four character signalling ID such as 1A23 -
+   * from the train identity of the CIF BS record.
+   *
+   * Not standard GTFS, which has no field for it: `trip_short_name` already
+   * carries the retail service ID. Optional because only the rail feed has
+   * one, and null on a trip whose schedule left it blank.
+   */
+  headcode?: string | null;
+  /**
    * The line this trip runs over, into shapes.txt.
    *
    * Optional because a feed need not draw one, and null on a trip whose stations

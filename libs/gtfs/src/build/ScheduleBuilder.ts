@@ -297,7 +297,9 @@ export class ScheduleBuilder {
       row.stp_indicator,
       mode === RouteType.Rail && row.train_class !== "S",
       row.reservations !== null,
-      path
+      path,
+      // trimmed because Postgres pads a char column back out to its width
+      row.train_identity?.trim() || null
     );
   }
 

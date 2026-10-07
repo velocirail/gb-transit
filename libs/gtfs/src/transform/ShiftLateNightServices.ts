@@ -60,7 +60,8 @@ const WINDRUSH = "WIN";
  *
  * The CIF does not say which pass a schedule means, so it is taken from the shape London Overground
  * publishes the Windrush night service in: new schedules dated to that Sunday alone. The 9Z
- * signalling IDs #165 names would say it directly, but the headcode does not reach `Schedule`.
+ * signalling IDs #165 names would say it directly, and `Schedule.headcode` now carries them;
+ * switching this over to them is a change of its own.
  *
  * New rather than any short term plan record, because an overlay dated to that Sunday is how the
  * BST departure already in the timetable gets retimed by a minute or two. That train is the first

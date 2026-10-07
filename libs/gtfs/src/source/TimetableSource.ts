@@ -67,6 +67,8 @@ export interface ScheduleStopTimeRow {
   id: number,
   train_uid: TUID,
   retail_train_id: RSID,
+  // The BS record's train identity, the headcode. Null where the record leaves it blank.
+  train_identity: string | null,
   runs_from: string,
   runs_to: string,
   monday: 0 | 1,

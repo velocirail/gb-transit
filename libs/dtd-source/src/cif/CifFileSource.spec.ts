@@ -36,9 +36,10 @@ const tiploc = (code: string, crs: string) =>
 /**
  * A BS record. `course_indicator` is not nullable, so it has to hold something.
  */
-const schedule = (uid: string, from: string, to: string, days: string, stp: string, action = "N", category = "OO") =>
+const schedule = (uid: string, from: string, to: string, days: string, stp: string, action = "N", category = "OO",
+                  identity = "") =>
   at([0, "BS"], [2, action], [3, uid], [9, from], [15, to], [21, days], [28, " "],
-     [29, "P"], [30, category], [40, "1"], [66, "B"], [79, stp]);
+     [29, "P"], [30, category], [32, identity], [40, "1"], [66, "B"], [79, stp]);
 
 const extra = (atoc: string, rsid: string) =>
   at([0, "BX"], [11, atoc], [13, "P"], [14, rsid]);
@@ -92,7 +93,7 @@ const refresh = () => zip("RJTTF001", {
   MCA: [
     tiploc("TONBDG", "TON"),
     tiploc("SEVNOKS", "SEV"),
-    schedule("C00001", "240101", "240401", "1111100", "P"),
+    schedule("C00001", "240101", "240401", "1111100", "P", "N", "OO", "2A15"),
     extra("SE", "SE000100"),
     origin("TONBDG ", "0800 "),
     terminus("SEVNOKS", "0820 ")
@@ -100,7 +101,7 @@ const refresh = () => zip("RJTTF001", {
   ALF: ["M=WALK,O=TON,D=SEV,T=25,S=0001,E=2359,P=6,R=1111111"],
   FLF: ["ADDITIONAL LINK: BUS BETWEEN TON AND HLD IN   9 MINUTES", "END"],
   ZTR: [
-    schedule("Z00001", "240101", "240401", "1111100", "P", "N", "BR"),
+    schedule("Z00001", "240101", "240401", "1111100", "P", "N", "BR", "0B00"),
     extra("ZZ", ""),
     origin("TON", "0900 "),
     terminus("SEV", "0930 ")
@@ -190,6 +191,7 @@ describe("CifFileSource", () => {
 
     expect(train.operator).to.equal("SE");
     expect(train.rsid).to.equal("SE000100");
+    expect(train.headcode).to.equal("2A15");
     // The station, not the platform. The platform rides alongside and only
     // becomes part of the stop id when stop_times.txt is written.
     expect(train.stopTimes.map(s => [s.stop_id, s.platform, s.arrival_time, s.stop_sequence]))
@@ -257,6 +259,25 @@ describe("CifFileSource", () => {
 
     expect(bus.stopTimes.map(s => s.stop_id)).to.deep.equal(["TON", "SEV"]);
     expect(bus.operator).to.equal("ZZ");
+    // through offsetId too, which rebuilds every z-train
+    expect(bus.headcode).to.equal("0B00");
+  });
+
+  it("leaves the headcode null where the BS record leaves the train identity blank", async () => {
+    const blank = zip("RJTTF001", {
+      MSN,
+      MCA: [
+        tiploc("TONBDG", "TON"),
+        tiploc("SEVNOKS", "SEV"),
+        schedule("C00002", "240101", "240401", "1111100", "P"),
+        extra("SE", "SE000200"),
+        origin("TONBDG ", "0800 "),
+        terminus("SEVNOKS", "0820 ")
+      ]
+    });
+    const {schedules} = await source(blank).getSchedules();
+
+    expect(schedules.find(s => s.tuid === "C00002")!.headcode).to.equal(null);
   });
 
   /**

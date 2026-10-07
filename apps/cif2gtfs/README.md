@@ -154,6 +154,10 @@ or take it from wherever you already keep it.
 `calendar.txt` and `calendar_dates.txt`. Output is byte-identical to what `dtd2mysql --gtfs`
 produces from the same feed files, and the same input and `--today` always produce the same bytes.
 
+`trips.txt` carries one column GTFS does not define: `headcode`, the train identity from the
+schedule's BS record (such as `1A23`). `trip_short_name` holds the retail service ID, so the
+headcode has a column of its own. It is empty where the record leaves it blank.
+
 A build that finds no schedules in the window fails rather than writing an empty feed.
 
 Building three months of the whole GB network takes around 45 seconds and 5 GB of memory.

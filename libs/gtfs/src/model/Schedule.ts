@@ -44,7 +44,16 @@ export class Schedule implements OverlayRecord {
      * was not asked for the passing points. A shape then falls back to the
      * calls, which is the same list minus whatever it never learned.
      */
-    public readonly path: readonly CRS[] = []
+    public readonly path: readonly CRS[] = [],
+    /**
+     * The headcode: the train identity from the BS record, such as 1A23. It
+     * is what the signaller and the crew call the train, where the RSID is
+     * what it is sold as.
+     *
+     * Null where the record leaves it blank. A CR record can change it part
+     * way along the journey; this is the one the train starts with.
+     */
+    public readonly headcode: string | null = null
   ) {}
 
   public get tripId(): string {
@@ -86,7 +95,8 @@ export class Schedule implements OverlayRecord {
       this.stp,
       this.firstClassAvailable,
       this.reservationPossible,
-      this.path
+      this.path,
+      this.headcode
     );
   }
 
@@ -96,6 +106,10 @@ export class Schedule implements OverlayRecord {
    * The headsign is what a passenger reads on the front of the train, so it is
    * where the train is going. `destination` is the name of the last stop, which
    * the caller has and this does not.
+   *
+   * `headcode` is not a GTFS field. The RSID already has `trip_short_name`, so
+   * the train identity goes in a column of its own, which a consumer that does
+   * not know it ignores.
    *
    * `wheelchair_accessible` and `bikes_allowed` are both 0, which in GTFS means
    * "no information". Nothing in the DTD feed says otherwise, and claiming
@@ -116,6 +130,7 @@ export class Schedule implements OverlayRecord {
       direction_id: 0,
       wheelchair_accessible: 0,
       bikes_allowed: 0,
+      headcode: this.headcode,
       shape_id: shapeId ?? null
     };
   }

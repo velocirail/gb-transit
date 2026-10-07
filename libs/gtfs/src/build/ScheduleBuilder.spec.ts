@@ -23,6 +23,7 @@ const row = (overrides: object = {}): ScheduleStopTimeRow => (<ScheduleStopTimeR
   id: 1,
   train_uid: "C00001",
   retail_train_id: "SR000100",
+  train_identity: "2C14",
   runs_from: "2026-08-01",
   runs_to: "2026-12-01",
   monday: 1, tuesday: 1, wednesday: 1, thursday: 1, friday: 1, saturday: 0, sunday: 0,
@@ -54,6 +55,23 @@ describe("ScheduleBuilder", () => {
 
     expect(builder.results.schedules.length).to.equal(1);
     expect(builder.results.schedules[0].stopTimes.length).to.equal(2);
+  });
+
+  it("takes the headcode from the train identity", async () => {
+    const builder = new ScheduleBuilder();
+
+    await builder.loadSchedules(stream([row()]));
+
+    expect(builder.results.schedules[0].headcode).to.equal("2C14");
+  });
+
+  // Postgres hands a char(4) back padded to its width, so a blank one is four spaces rather than null
+  it.each([null, "", "    "])("has no headcode where the train identity is %j", async identity => {
+    const builder = new ScheduleBuilder();
+
+    await builder.loadSchedules(stream([row({train_identity: identity})]));
+
+    expect(builder.results.schedules[0].headcode).to.equal(null);
   });
 
   /**

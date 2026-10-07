@@ -41,6 +41,20 @@ describe("Schedule", () => {
       .to.deep.equal(["AAA", "BBB", "CCC"]);
   });
 
+  it("keeps the headcode through a clone", () => {
+    expect(withHeadcode("1A23").clone(ALL_DAYS_CALENDAR, 2).headcode).to.equal("1A23");
+  });
+
+  it("writes the headcode into its own column of the trip, leaving the RSID in trip_short_name", () => {
+    const trip = withHeadcode("1A23").toTrip(1, "London Paddington");
+
+    expect([trip.headcode, trip.trip_short_name]).to.deep.equal(["1A23", "GW123400"]);
+  });
+
+  it("writes no headcode where the schedule has none", () => {
+    expect(withHeadcode(null).toTrip(1, "London Paddington").headcode).to.equal(null);
+  });
+
   it("identifies a trip by TUID, STP indicator and date range", () => {
     const permanent = schedule(1, "A", "2017-01-01", "2017-01-31", STP.Permanent);
     const overlay = schedule(2, "A", "2017-01-01", "2017-01-31", STP.Overlay);
@@ -151,6 +165,30 @@ describe("a schedule as a GTFS route", () => {
 });
 
 const ALL_DAYS: Days = { 0: 1, 1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1 };
+
+const ALL_DAYS_CALENDAR = new ScheduleCalendar(
+  Temporal.PlainDate.from("2017-01-01"),
+  Temporal.PlainDate.from("2017-01-31"),
+  ALL_DAYS,
+  {}
+);
+
+function withHeadcode(headcode: string | null): Schedule {
+  return new Schedule(
+    1,
+    [stop("PNZ", "00:30")],
+    "A",
+    "GW123400",
+    ALL_DAYS_CALENDAR,
+    RouteType.Rail,
+    "GW",
+    STP.Permanent,
+    true,
+    true,
+    [],
+    headcode
+  );
+}
 
 /**
  * A schedule that is only the things a route is worked out from: who runs it,
